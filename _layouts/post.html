@@ -1,0 +1,88 @@
+---
+layout: default
+---
+
+<article class="post">
+  <h1>{{ page.title }}</h1>
+  <span class="post-date">{{ page.date | date_to_string }}</span> |
+  {% if site.read_time %} 
+    {% include read-time.html %}
+  {% endif %}
+
+  {% if page.category %}
+  {% for tag in page.category %}
+    <br/><a href="{{ site.baseurl }}{{ site.category_page }}#{{ tag | slugify }}" class="cat-tag">{{ tag }}</a>
+  {% endfor %}
+  {% endif %}
+  {% if page.tags %} | 
+  {% for tag in page.tags %}
+    <a href="{{ site.baseurl }}{{ site.tag_page }}#{{ tag | slugify }}" class="post-tag">{{ tag }}</a>
+  {% endfor %}
+  {% endif %}
+  
+  <div class="entry">
+    {{ content }}
+  </div>
+
+  <div class="date">
+    Written on {{ page.date | date: "%B %e, %Y" }}
+  </div>
+
+<h2>Related Posts</h2>	
+	
+<div class="relatedPosts">
+
+{% assign maxRelated = 4 %}
+{% assign minCommonTags =  1 %}
+{% assign maxRelatedCounter = 0 %}
+
+  {% for post in site.posts %}
+
+    {% assign sameTagCount = 0 %}
+    {% assign commonTags = '' %}
+
+    {% for tag in post.tags %}
+      {% if post.url != page.url %}
+        {% if page.tags contains tag %}
+          {% assign sameTagCount = sameTagCount | plus: 1 %}
+          {% capture tagmarkup %} <a class="post-tag">{{ tag }}</a>{% endcapture %}
+          {% assign commonTags = commonTags | append: tagmarkup %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+	
+    {% if sameTagCount >= minCommonTags %}
+      <div>
+        <h5><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h5>{{ commonTags }}
+	  {% if site.read_time %} 
+    	  {%- assign words_per_minute = site.words_per_minute | default: 200 -%}
+    	  {%- assign min_read = site.data.text[site.locale].min_read | default: 'min read' -%}
+    	  {% assign words = post.content | strip_html | number_of_words %}
+    	  <span class="read-time">
+      	  {%- if words < words_per_minute -%}
+    	      ~1 {{ min_read }}
+      	  {%- else -%}
+       	   {{ words | divided_by:words_per_minute }} {{ min_read }}
+      	  {%- endif -%}
+   	   </span>
+    	  {% endif %}	  
+         
+      </div>
+      {% assign maxRelatedCounter = maxRelatedCounter | plus: 1 %}
+      {% if maxRelatedCounter >= maxRelated %}
+        {% break %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}	
+</div>
+	
+	<font size="3">
+  	<h6>1 Thess 5:11 Therefore encourage one another and build one another up, just as you are doing.</h6>
+	<p>The purpose of the comments section below is for us to share our thoughts and experiences with God and His words. It is meant to spur each other toward God. </p>
+	<p>Let us be kind in the use of words and providing suggestions to improve these sermon notes. Ultimately, it is for the edification and building up the body of Christ. </p>
+	<p>Comments that are continuously being flagged as inappropriate will automatically removed from the discussion thread.</p>
+	<font>
+	
+		
+  {% include disqus.html %}
+</article>
